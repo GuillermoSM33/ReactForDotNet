@@ -1,9 +1,70 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Helmet } from "react-helmet";
-import { useNavigate } from "react-router-dom"; 
+import { useNavigate, useParams } from "react-router-dom"; 
 
 function Edit() {
+  const { id } = useParams(); 
   const navigate = useNavigate(); 
+
+  const [studentName, setStudentName] = useState("");
+  const [studentAge, setStudentAge] = useState("");
+  const [studentEmail, setStudentEmail] = useState("");
+
+  useEffect(() => {
+    const fetchStudent = async () => {
+      try {
+        const response = await fetch(`https://localhost:7183/api/estudiantes/${id}`);
+        if (!response.ok) {
+          throw new Error("Error al obtener el estudiante");
+        }
+        const data = await response.json();
+        setStudentName(data.result.nombre);
+        setStudentAge(data.result.edad.toString());
+        setStudentEmail(data.result.correo);
+      } catch (error) {
+        console.error("Error al obtener el estudiante:", error);
+      }
+    };
+
+    fetchStudent();
+  }, [id]);
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault(); 
+
+    const updatedStudent = {
+      id: parseInt(id || "0"), 
+      nombre: studentName,
+      edad: parseInt(studentAge), 
+      correo: studentEmail
+    };
+
+    try {
+      const response = await fetch(`https://localhost:7183/api/estudiantes/update/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify(updatedStudent)
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al actualizar el estudiante");
+      }
+
+      const result = await response.json();
+      if (result.succeeded) {
+        alert("Estudiante actualizado exitosamente");
+        navigate("/"); 
+      } else {
+        alert(`Error: ${result.message || "No se pudo actualizar el estudiante"}`);
+      }
+    } catch (error) {
+      console.error("Error al actualizar el estudiante:", error);
+      alert("Error al actualizar el estudiante");
+    }
+  };
 
   return (
     <>
@@ -15,7 +76,7 @@ function Edit() {
           <h1 className="text-3xl font-bold text-center text-blue-500 mb-8">
             Editar Estudiante
           </h1>
-          <form className="space-y-6">
+          <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
               <label
                 htmlFor="studentName"
@@ -28,8 +89,9 @@ function Edit() {
                 id="studentName"
                 name="studentName"
                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Editar el nombre del estudiante"
-                defaultValue="John Doe" 
+                value={studentName} 
+                onChange={(e) => setStudentName(e.target.value)} 
+                required
               />
             </div>
 
@@ -41,12 +103,13 @@ function Edit() {
                 Edad del Estudiante
               </label>
               <input
-                type="integer"
+                type="number"
                 id="studentAge"
                 name="studentAge"
                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Editar la edad del estudiante"
-                defaultValue="20"
+                value={studentAge}
+                onChange={(e) => setStudentAge(e.target.value)}
+                required
               />
             </div>
 
@@ -58,12 +121,13 @@ function Edit() {
                 Correo del Estudiante
               </label>
               <input
-                type="text"
+                type="email"
                 id="studentEmail"
                 name="studentEmail"
                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Editar el correo del estudiante"
-                defaultValue=""
+                value={studentEmail}
+                onChange={(e) => setStudentEmail(e.target.value)}
+                required
               />
             </div>
 
