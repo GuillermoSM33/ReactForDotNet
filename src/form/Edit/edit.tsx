@@ -1,7 +1,10 @@
 import React from "react";
 import { Helmet } from "react-helmet";
+import { useNavigate } from "react-router-dom"; 
 
 function Edit() {
+  const navigate = useNavigate(); 
+
   return (
     <>
       <Helmet>
@@ -30,6 +33,40 @@ function Edit() {
               />
             </div>
 
+            <div>
+              <label
+                htmlFor="studentAge"
+                className="block text-lg font-medium text-gray-700 mb-2"
+              >
+                Edad del Estudiante
+              </label>
+              <input
+                type="integer"
+                id="studentAge"
+                name="studentAge"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Editar la edad del estudiante"
+                defaultValue="20"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="studentEmail"
+                className="block text-lg font-medium text-gray-700 mb-2"
+              >
+                Correo del Estudiante
+              </label>
+              <input
+                type="text"
+                id="studentEmail"
+                name="studentEmail"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Editar el correo del estudiante"
+                defaultValue=""
+              />
+            </div>
+
             <div className="flex justify-between space-x-4">
               <button
                 type="submit"
@@ -40,6 +77,7 @@ function Edit() {
               <button
                 type="button"
                 className="bg-gray-500 text-white py-3 px-6 rounded-lg font-semibold text-lg hover:bg-gray-600 transition-all"
+                onClick={() => navigate("/")}
               >
                 Cancelar
               </button>

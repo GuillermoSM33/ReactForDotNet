@@ -1,7 +1,50 @@
-import React from "react";
+import React, { useState } from "react";
 import { Helmet } from "react-helmet";
+import { useNavigate } from "react-router-dom"; 
 
 function Add() {
+  const navigate = useNavigate(); 
+  const [studentName, setStudentName] = useState("");
+  const [studentAge, setStudentAge] = useState("");
+  const [studentEmail, setStudentEmail] = useState("");
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault(); 
+
+    const studentData = {
+      nombre: studentName,
+      edad: parseInt(studentAge), 
+      correo: studentEmail
+    };
+
+    try {
+      const response = await fetch("https://localhost:7183/api/estudiantes/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify(studentData)
+      });
+
+      if (!response.ok) {
+        throw new Error("Error en la solicitud");
+      }
+
+      const result = await response.json();
+
+      if (result.succeeded) {
+        alert("Estudiante agregado exitosamente"); 
+        navigate("/"); 
+      } else {
+        alert(`Error: ${result.message || "No se pudo agregar el estudiante"}`);
+      }
+    } catch (error) {
+      console.error("Error al agregar el estudiante:", error);
+      alert("Error al agregar el estudiante");
+    }
+  };
+
   return (
     <>
       <Helmet>
@@ -12,7 +55,7 @@ function Add() {
           <h1 className="text-3xl font-bold text-center text-cyan-500 mb-8">
             Agregar Estudiante
           </h1>
-          <form className="space-y-6">
+          <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
               <label
                 htmlFor="studentName"
@@ -24,8 +67,49 @@ function Add() {
                 type="text"
                 id="studentName"
                 name="studentName"
+                value={studentName}
+                onChange={(e) => setStudentName(e.target.value)}
                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                 placeholder="Escribe el nombre del estudiante"
+                required
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="studentAge"
+                className="block text-lg font-medium text-gray-700 mb-2"
+              >
+                Edad del Estudiante
+              </label>
+              <input
+                type="number"
+                id="studentAge"
+                name="studentAge"
+                value={studentAge}
+                onChange={(e) => setStudentAge(e.target.value)}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                placeholder="Escriba la edad del estudiante"
+                required
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="studentEmail"
+                className="block text-lg font-medium text-gray-700 mb-2"
+              >
+                Correo del Estudiante
+              </label>
+              <input
+                type="email"
+                id="studentEmail"
+                name="studentEmail"
+                value={studentEmail}
+                onChange={(e) => setStudentEmail(e.target.value)}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                placeholder="Escribe el correo del estudiante"
+                required
               />
             </div>
 
